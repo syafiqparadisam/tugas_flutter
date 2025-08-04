@@ -1,7 +1,28 @@
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen(key);
+class BiodataPage extends StatefulWidget {
+  const BiodataPage();
+
+   @override
+  State<BiodataPage> createState() => _BiodataState();
+}
+
+class _BiodataState extends State<BiodataPage> {
+  void _showDetail() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Detail"),
+        content: const Text("Halo nama saya M. Syafiq Paradisam, Hobi Ngoding C/C++,Go,Rust,PHP"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +41,9 @@ class HomeScreen extends StatelessWidget {
               "Halo, ini adalah teks",
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
             ),
-            ElevatedButton(onPressed: () => {}, child: const Text("Klik aku")),
+            Padding(padding: EdgeInsetsGeometry.all(20)),
+            ElevatedButton(onPressed: _showDetail, child: const Text("Klik aku")),
+            Padding(padding: EdgeInsetsGeometry.all(20)),
             ClipRRect(
               borderRadius: BorderRadius.circular(
                 140,
@@ -33,8 +56,8 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             Container(
-              width: 300,
-              height: 150,
+              width: 250,
+              height: 120,
               alignment: Alignment.center,
 
               decoration: BoxDecoration(
