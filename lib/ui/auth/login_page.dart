@@ -1,8 +1,9 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mobile_bab2/routing/routes.dart';
+import 'package:mobile_bab2/ui/auth/auth_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,25 +15,27 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _loading = false;
 
-  void _login() {
-    if (usernameController.text == 'admin' &&
-        passwordController.text == '1234') {
-      context.push(Routes.dashboard);
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _loading = true);
+    final r = await AuthService.login(
+      usernameController.text,
+      passwordController.text,
+    );
+    setState(() => _loading = false);
+
+    if (r.success) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', r.data!['token']);
+
+      context.go(Routes.dashboard);
     } else {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Login Gagal"),
-          content: const Text("Username atau password salah!"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK"),
-            ),
-          ],
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(r.message)));
     }
   }
 
@@ -61,75 +64,77 @@ class _LoginPageState extends State<LoginPage> {
                 filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                 child: Container(
                   width: 320,
-                  
                   padding: const EdgeInsets.all(24.0),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withAlpha(2),
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.white.withOpacity(0.3)),
+                    border: Border.all(color: Colors.white.withAlpha(3)),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Text(
-                        "Login Page",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 32,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: usernameController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: 'Username',
-                          labelStyle: const TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white.withOpacity(0.1),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          "Login Page",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 32,
+                            color: Colors.white,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: passwordController,
-                        obscureText: true,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          labelStyle: const TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white.withOpacity(0.1),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none,
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: usernameController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: 'Username',
+                            labelStyle: const TextStyle(color: Colors.white),
+                            filled: true,
+                            fillColor: Colors.white.withAlpha(1),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide.none,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                        const SizedBox(height: 20),
+                        TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            labelStyle: const TextStyle(color: Colors.white),
+                            filled: true,
+                            fillColor: Colors.white.withAlpha(1),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide.none,
+                            ),
                           ),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          onPressed: _loading ? null : _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
                           ),
-                          child: Text("Login"),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            child: Text("Login"),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
