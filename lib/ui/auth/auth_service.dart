@@ -11,7 +11,7 @@ class AuthResult {
 }
 
 class AuthService {
-  static final baseUrl = Uri.parse('${dotenv.env['API_URL']}/index.php');
+  static final baseUrl = dotenv.env['API_URL'];
 
   static Future<AuthResult> login(String username, String password) async {
     final url = Uri.parse('$baseUrl/index.php');
