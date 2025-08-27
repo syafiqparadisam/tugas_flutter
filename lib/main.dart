@@ -6,10 +6,10 @@ import 'routing/router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   await dotenv.load(fileName: ".env");
   final prefs = await SharedPreferences.getInstance();
   debugPrint = (String? message, {int? wrapWidth}) {};
   final token = prefs.getString('token');
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp();
   runApp(MyApp(token: token));
 }

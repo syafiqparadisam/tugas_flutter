@@ -41,21 +41,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $token = $_GET['token'] ?? null; // null kalau tidak ada
-    // exit;
-   
 
     if ($token == null || $token == "") {
         json_out(403, ['success' => false, 'message' => 'Unauthorized']);
     }
 
-
-
     $stmt = $mysqli->prepare("SELECT id, username, full_name, role FROM users WHERE token = ?");
     $stmt->bind_param('s', $token);
     $stmt->execute();
     $user = $stmt->get_result()->fetch_assoc();
-
-
 
     if (!$user) {
         json_out(401, [

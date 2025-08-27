@@ -14,6 +14,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   String? username;
   String? fullName;
+  String? role;
   String? token;
   bool loading = true;
 
@@ -45,11 +46,10 @@ class _DashboardPageState extends State<DashboardPage> {
       return;
     }
 
-    print(result);
-
     setState(() {
       username = result.data?['username'];
       fullName = result.data?['full_name'];
+      role = result.data?['role'];
       loading = false;
     });
   }
@@ -83,6 +83,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Text('Username: $username'),
             const SizedBox(height: 8),
             Text('Token (demo): $token', overflow: TextOverflow.ellipsis),
+            Text('role: $role', overflow: TextOverflow.ellipsis),
             ElevatedButton(
               onPressed: () => logout(context),
               child: const Text("Logout"),
