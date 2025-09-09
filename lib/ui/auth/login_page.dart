@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', r.data!['token']);
 
-      context.go(Routes.dashboard);
+      context.go(Routes.dashboardFooter);
     } else {
       ScaffoldMessenger.of(
         context,
